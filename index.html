@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Expandable Radio Options</title>
+  <style>
+    .radio-group {
+      margin-bottom: 1em;
+    }
+    .variant-group {
+      margin-left: 2em;
+      margin-top: 0.25em;
+      background: #f8f8f8;
+      padding: 0.5em 1em;
+      border-radius: 8px;
+      display: none;
+    }
+    .variant-group.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h2>Choose an Option</h2>
+  <form id="form"> <!-- ✅ Added the missing ID -->
+    <div class="radio-group">
+      <input type="radio" name="main" id="optionA" value="A">
+      <label for="optionA">Option A</label>
+      <div id="variantsA" class="variant-group">
+        <label><input type="radio" name="variantA" value="A1"> A1</label><br>
+        <label><input type="radio" name="variantA" value="A2"> A2</label>
+      </div>
+    </div>
+    <div class="radio-group">
+      <input type="radio" name="main" id="optionB" value="B">
+      <label for="optionB">Option B</label>
+      <div id="variantsB" class="variant-group">
+        <label><input type="radio" name="variantB" value="B1"> B1</label><br>
+        <label><input type="radio" name="variantB" value="B2"> B2</label><br>
+        <label><input type="radio" name="variantB" value="B3"> B3</label>
+      </div>
+    </div>
+    <div class="radio-group">
+      <input type="radio" name="main" id="optionC" value="C">
+      <label for="optionC">Option C</label>
+      <div id="variantsC" class="variant-group">
+        <label><input type="radio" name="variantC" value="C1"> C1</label>
+      </div>
+    </div>
+  </form>
+
+  <script>
+    const radios = document.querySelectorAll('input[name="main"]');
+    const variantGroups = {
+      A: document.getElementById('variantsA'),
+      B: document.getElementById('variantsB'),
+      C: document.getElementById('variantsC'),
+    };
+
+    function hideAllVariants() {
+      Object.values(variantGroups).forEach(group => group.classList.remove('show'));
+    }
+
+    radios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        hideAllVariants();
+        const selected = radio.value;
+        if (variantGroups[selected]) {
+          variantGroups[selected].classList.add('show');
+        }
+      });
+    });
+  </script>
+
+  <script>
+    (function () {
+      function postHeight() {
+        const form = document.querySelector('#form') || document.forms[0];
+        if (!form) return;
+        const height = form.scrollHeight;
+
+        console.log('[postMessage] height sent:', height); // ✅ Debug
+
+        window.parent.postMessage(
+          { type: 'FORM_HEIGHT', height },
+          '*'
+        );
+      }
+
+      window.addEventListener('load', () => setTimeout(postHeight, 100));
+
+      const form = document.querySelector('#form') || document.forms[0];
+      if (form) {
+        const observer = new MutationObserver(() => {
+          postHeight();
+        });
+        observer.observe(form, { childList: true, subtree: true });
+      }
+
+      setInterval(postHeight, 1000);
+    })();
+  </script>
+</body>
+</html>
