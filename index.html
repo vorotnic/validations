@@ -72,33 +72,40 @@
     });
   </script>
 
-  <script>
-    (function () {
-      function postHeight() {
-        const form = document.querySelector('#form') || document.forms[0];
-        if (!form) return;
-        const height = form.scrollHeight;
+ <script>
+(function () {
+  function postHeight() {
+    const form = document.querySelector('#form') || document.forms[0];
+    if (!form) return;
 
-        console.log('[postMessage] height sent:', height); // ✅ Debug
+    const height = form.scrollHeight;
+    window.parent.postMessage(
+      { type: 'FORM_HEIGHT', height },
+      'https://msfusa.tfaforms.net' // Use * if unsure about exact domain
+    );
+  }
 
-        window.parent.postMessage(
-          { type: 'FORM_HEIGHT', height },
-          '*'
-        );
-      }
+  window.addEventListener('load', () => {
+    postHeight(); // Send initial height
+  });
 
-      window.addEventListener('load', () => setTimeout(postHeight, 100));
+  const form = document.querySelector('#form') || document.forms[0];
+  if (form) {
+    form.addEventListener('input', postHeight);
+    form.addEventListener('pointerdown', postHeight);
+  }
 
-      const form = document.querySelector('#form') || document.forms[0];
-      if (form) {
-        const observer = new MutationObserver(() => {
-          postHeight();
-        });
-        observer.observe(form, { childList: true, subtree: true });
-      }
+  const observer = new MutationObserver(postHeight);
+  if (form) {
+    observer.observe(form, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      characterData: true,
+    });
+  }
+})();
+</script>
 
-      setInterval(postHeight, 10);
-    })();
-  </script>
 </body>
 </html>
