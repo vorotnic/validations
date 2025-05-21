@@ -7,7 +7,7 @@
  html, body {
       margin: 0;
       padding: 0;
-      overflow: hidden; /* Prevent internal scrollbars */
+      scrollbar-width: none;
       height: auto;
     }
 
@@ -36,7 +36,7 @@
   <form id="form">
     <div class="radio-group" data-variant="variantsA">
       <input type="radio" name="main" id="optionA" value="A">
-      <label for="optionA">Option 1</label>
+      <label for="optionA">Option scrollbar</label>
       <div id="variantsA" class="variant-group">
         <label><input type="radio" name="variantA" value="A1"> A1</label><br>
         <label><input type="radio" name="variantA" value="A2"> A2</label>
