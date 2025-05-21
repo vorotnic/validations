@@ -4,15 +4,9 @@
   <meta charset="UTF-8">
   <title>Expandable Radio Options</title>
   <style>
-    html, body {
+    body {
       margin: 0;
       padding: 0;
-      overflow: hidden; /* Prevent internal scrollbars */
-      height: auto;
-    }
-
-    form {
-      overflow: hidden;
     }
 
     .radio-group {
@@ -36,17 +30,18 @@
 <body>
   <h2>Choose an Option</h2>
   <form id="form">
-    <div class="radio-group">
+    <div class="radio-group" data-variant="variantsA">
       <input type="radio" name="main" id="optionA" value="A">
-      <label for="optionA">Option A</label>
+      <label for="optionA">Option 1</label>
       <div id="variantsA" class="variant-group">
         <label><input type="radio" name="variantA" value="A1"> A1</label><br>
         <label><input type="radio" name="variantA" value="A2"> A2</label>
       </div>
     </div>
-    <div class="radio-group">
+
+    <div class="radio-group" data-variant="variantsB">
       <input type="radio" name="main" id="optionB" value="B">
-      <label for="optionB">Option B1</label>
+      <label for="optionB">Option 2</label>
       <div id="variantsB" class="variant-group">
         <label><input type="radio" name="variantB" value="B1"> B1</label><br>
         <label><input type="radio" name="variantB" value="B2"> B2</label><br>
@@ -56,9 +51,10 @@
         <label><input type="radio" name="variantB" value="B6"> B6</label>
       </div>
     </div>
-    <div class="radio-group">
+
+    <div class="radio-group" data-variant="variantsC">
       <input type="radio" name="main" id="optionC" value="C">
-      <label for="optionC">Option C</label>
+      <label for="optionC">Option 3</label>
       <div id="variantsC" class="variant-group">
         <label><input type="radio" name="variantC" value="C1"> C1</label>
       </div>
@@ -66,66 +62,41 @@
   </form>
 
   <script>
-    // Toggle conditional variant sections
-    const radios = document.querySelectorAll('input[name="main"]');
-    const variantGroups = {
-      A: document.getElementById('variantsA'),
-      B: document.getElementById('variantsB'),
-      C: document.getElementById('variantsC'),
-    };
+    const mainRadios = document.querySelectorAll('input[name="main"]');
+    const variantGroups = document.querySelectorAll('.variant-group');
 
-    function hideAllVariants() {
-      Object.values(variantGroups).forEach(group => group.classList.remove('show'));
-    }
-
-    radios.forEach(radio => {
+    mainRadios.forEach(radio => {
       radio.addEventListener('change', () => {
-        hideAllVariants();
-        const selected = radio.value;
-        if (variantGroups[selected]) {
-          variantGroups[selected].classList.add('show');
-        }
+        variantGroups.forEach(group => group.classList.remove('show'));
+        const group = document.querySelector(`#variants${radio.value}`);
+        if (group) group.classList.add('show');
       });
     });
   </script>
 
   <script>
-    (function () {
+    (() => {
       const postHeight = () => {
-        const form = document.forms[0];
-        if (!form) return;
-
-        const height = form.scrollHeight || form.offsetHeight || 0;
-
-        window.parent.postMessage(
-          { type: 'FORM_HEIGHT', height },
-          '*'
-        );
-
+        const height = document.getElementById('form')?.scrollHeight || 0;
+        window.parent.postMessage({ type: 'FORM_HEIGHT', height }, '*');
         console.log('[postMessage] Sent height:', height);
       };
 
-      const scheduleAccurateHeightPost = () => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(postHeight); // Double-frame for accurate layout
-        });
+      const scheduleHeightPost = () => {
+        requestAnimationFrame(() => requestAnimationFrame(postHeight));
       };
 
       window.addEventListener('load', () => {
-        const form = document.forms[0];
+        const form = document.getElementById('form');
         if (!form) return;
 
-        // Initial accurate height
-        scheduleAccurateHeightPost();
+        scheduleHeightPost();
 
-        // Listen for changes in the DOM
-        const observer = new MutationObserver(scheduleAccurateHeightPost);
-        observer.observe(form, { childList: true, subtree: true });
+        new MutationObserver(scheduleHeightPost)
+          .observe(form, { childList: true, subtree: true });
 
-        // Listen for user actions that could affect height
-        ['input', 'pointerdown', 'change'].forEach(eventType => {
-          form.addEventListener(eventType, scheduleAccurateHeightPost);
-        });
+        ['input', 'pointerdown', 'change']
+          .forEach(e => form.addEventListener(e, scheduleHeightPost));
       });
     })();
   </script>
