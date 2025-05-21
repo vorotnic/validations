@@ -81,31 +81,33 @@
     });
   </script>
 
-  <script>
-    (() => {
-      const postHeight = () => {
-        const height = document.getElementById('form')?.scrollHeight || 0;
-        window.parent.postMessage({ type: 'FORM_HEIGHT', height }, '*');
-        console.log('[postMessage] Sent height:', height);
-      };
+<script>
+  (() => {
+    const postHeight = () => {
+      const height = document.forms[0]?.scrollHeight || 0;
+      window.parent.postMessage({ type: 'FORM_HEIGHT', height }, '*');
+      console.log('[postMessage] Sent height:', height);
+    };
 
-      const scheduleHeightPost = () => {
-        requestAnimationFrame(() => requestAnimationFrame(postHeight));
-      };
+    const scheduleHeightPost = () => {
+      requestAnimationFrame(() => requestAnimationFrame(postHeight));
+    };
 
-      window.addEventListener('load', () => {
-        const form = document.getElementById('form');
-        if (!form) return;
+    window.addEventListener('load', () => {
+      const form = document.forms[0];
+      if (!form) return;
 
-        scheduleHeightPost();
+      scheduleHeightPost();
 
-        new MutationObserver(scheduleHeightPost)
-          .observe(form, { childList: true, subtree: true });
+      new MutationObserver(scheduleHeightPost)
+        .observe(form, { childList: true, subtree: true });
 
-        ['input', 'pointerdown', 'change']
-          .forEach(e => form.addEventListener(e, scheduleHeightPost));
-      });
-    })();
-  </script>
+      ['input', 'pointerdown', 'change']
+        .forEach(eventType => form.addEventListener(eventType, scheduleHeightPost));
+    });
+  })();
+</script>
+
+  
 </body>
 </html>
