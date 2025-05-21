@@ -11,10 +11,7 @@
       height: auto;
     }
 
-    form {
-      overflow: hidden;
-    }
-
+    
     .radio-group {
       margin-bottom: 1em;
     }
@@ -102,7 +99,7 @@
       new MutationObserver(scheduleHeightPost)
         .observe(form, { childList: true, subtree: true });
 
-      ['input', 'pointerdown', 'change']
+      ['pointerdown', 'change']
         .forEach(eventType => form.addEventListener(eventType, scheduleHeightPost));
     });
   })();
