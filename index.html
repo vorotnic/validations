@@ -86,15 +86,20 @@
     console.log('[postMessage] Sent height:', height);
   }
 
+  function schedulePostHeight() {
+    // Wait until the next paint frame for layout to settle
+    requestAnimationFrame(postHeight);
+  }
+
   window.addEventListener('load', () => {
-    // Delay initial postHeight to let the form layout fully settle
-    setTimeout(postHeight, 300);
+    requestAnimationFrame(postHeight); // Initial postHeight on load
 
     const form = document.forms[0];
     if (!form) return;
 
-    form.addEventListener('input', postHeight);
-    form.addEventListener('pointerdown', postHeight);
+    // Fire postHeight after interactions (clicks, typing, etc.)
+    form.addEventListener('input', schedulePostHeight);
+    form.addEventListener('pointerdown', schedulePostHeight);
   });
 })();
 </script>
