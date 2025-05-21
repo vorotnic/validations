@@ -72,40 +72,34 @@
     });
   </script>
 
- <script>
+<script>
 (function () {
   function postHeight() {
-    const form = document.querySelector('#form') || document.forms[0];
+    const form = document.forms[0];
     if (!form) return;
 
     const height = form.scrollHeight;
     window.parent.postMessage(
       { type: 'FORM_HEIGHT', height },
-      '*' // Use * if unsure about exact domain
+      '*'
     );
+    console.log('[postMessage] Sent height:', height);
   }
 
   window.addEventListener('load', () => {
-    postHeight(); // Send initial height
-  });
+    // Send height once on load
+    postHeight();
 
-  const form = document.querySelector('#form') || document.forms[0];
-  if (form) {
+    const form = document.forms[0];
+    if (!form) return;
+
+    // Send height on user interactions
     form.addEventListener('input', postHeight);
     form.addEventListener('pointerdown', postHeight);
-  }
-
-  const observer = new MutationObserver(postHeight);
-  if (form) {
-    observer.observe(form, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      characterData: true,
-    });
-  }
+  });
 })();
 </script>
+
 
 </body>
 </html>
