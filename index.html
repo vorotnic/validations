@@ -78,7 +78,7 @@
     const form = document.forms[0];
     if (!form) return;
 
-    const height = form.scrollHeight;
+    const height = form.scrollHeight || form.offsetHeight || 0;
     window.parent.postMessage(
       { type: 'FORM_HEIGHT', height },
       '*'
@@ -87,13 +87,12 @@
   }
 
   window.addEventListener('load', () => {
-    // Send height once on load
-    postHeight();
+    // Delay initial postHeight to let the form layout fully settle
+    setTimeout(postHeight, 300);
 
     const form = document.forms[0];
     if (!form) return;
 
-    // Send height on user interactions
     form.addEventListener('input', postHeight);
     form.addEventListener('pointerdown', postHeight);
   });
