@@ -77,38 +77,51 @@
 
 <script>
 (function () {
-  function postHeight() {
+  const postHeight = () => {
     const form = document.forms[0];
     if (!form) return;
 
+    // Prefer scrollHeight, fallback to offsetHeight
     const height = form.scrollHeight || form.offsetHeight || 0;
+
     window.parent.postMessage(
       { type: 'FORM_HEIGHT', height },
       '*'
     );
-    console.log('[postMessage] Sent height:', height);
-  }
 
-  function scheduleAccurateHeightPost() {
+    console.log('[postMessage] Sent height:', height);
+  };
+
+  const scheduleAccurateHeightPost = () => {
     requestAnimationFrame(() => {
-      requestAnimationFrame(postHeight); // double-frame for full layout render
+      requestAnimationFrame(postHeight); // ensures layout is settled
     });
-  }
+  };
 
   window.addEventListener('load', () => {
-    // Send height after full form render
-    scheduleAccurateHeightPost();
-
     const form = document.forms[0];
     if (!form) return;
 
-    // Recalculate height on any user interaction
-    form.addEventListener('input', scheduleAccurateHeightPost);
-    form.addEventListener('pointerdown', scheduleAccurateHeightPost);
-    form.addEventListener('change', scheduleAccurateHeightPost);
+    // Initial post after layout settles
+    scheduleAccurateHeightPost();
+
+    // Observe DOM changes inside form
+    const observer = new MutationObserver(() => {
+      scheduleAccurateHeightPost();
+    });
+    observer.observe(form, {
+      childList: true,
+      subtree: true,
+    });
+
+    // Also listen to user interactions
+    ['input', 'pointerdown', 'change'].forEach(eventType => {
+      form.addEventListener(eventType, scheduleAccurateHeightPost);
+    });
   });
 })();
 </script>
+
 
 
 
