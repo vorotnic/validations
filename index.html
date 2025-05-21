@@ -4,15 +4,22 @@
   <meta charset="UTF-8">
   <title>Expandable Radio Options</title>
   <style>
-    body {
+ html, body {
       margin: 0;
       padding: 0;
+      overflow: hidden; /* Prevent internal scrollbars */
+      height: auto;
+    }
+
+    form {
+      overflow: hidden;
     }
 
     .radio-group {
       margin-bottom: 1em;
     }
 
+  
     .variant-group {
       margin-left: 2em;
       margin-top: 0.25em;
