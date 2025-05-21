@@ -83,7 +83,6 @@
     const postHeight = () => {
       const height = document.forms[0]?.scrollHeight || 0;
       window.parent.postMessage({ type: 'FORM_HEIGHT', height }, '*');
-      console.log('[postMessage] Sent height:', height);
     };
 
     const scheduleHeightPost = () => {
