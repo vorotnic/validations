@@ -91,18 +91,21 @@
 
   function scheduleAccurateHeightPost() {
     requestAnimationFrame(() => {
-      requestAnimationFrame(postHeight); // extra frame for full layout
+      requestAnimationFrame(postHeight); // double-frame for full layout render
     });
   }
 
   window.addEventListener('load', () => {
+    // Send height after full form render
     scheduleAccurateHeightPost();
 
     const form = document.forms[0];
     if (!form) return;
 
+    // Recalculate height on any user interaction
     form.addEventListener('input', scheduleAccurateHeightPost);
     form.addEventListener('pointerdown', scheduleAccurateHeightPost);
+    form.addEventListener('change', scheduleAccurateHeightPost);
   });
 })();
 </script>
